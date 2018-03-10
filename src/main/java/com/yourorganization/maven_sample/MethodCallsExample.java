@@ -7,8 +7,15 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.base.Strings;
 import com.yourorganization.maven_sample.support.DirExplorer;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import java.io.File;
 import java.io.IOException;
+
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.javadoc.Javadoc;
+import java.util.Optional;
 
 public class MethodCallsExample {
 
@@ -19,9 +26,20 @@ public class MethodCallsExample {
             try {
                 new VoidVisitorAdapter<Object>() {
                     @Override
-                    public void visit(MethodCallExpr n, Object arg) {
+                    public void visit(MethodDeclaration n, Object arg) {
                         super.visit(n, arg);
+                        String name = n.getNameAsString();
+                        n.getJavadoc();
+                        Optional comment_options  =  n.getJavadocComment();
                         System.out.println(" [L " + n.getBegin().get().line + "] " + n);
+                        System.out.println("+++++++++name:" + name);
+                        System.out.println("+++++++++declarae:" + n.getDeclarationAsString());
+                        if(comment_options.isPresent()) {
+                            JavadocComment commet_object = (JavadocComment) comment_options.get();
+                            String commnet_str = commet_object.getContent();
+                            System.out.println("+++++++++注释:" + commnet_str);
+                        }
+
                     }
                 }.visit(JavaParser.parse(file), null);
                 System.out.println(); // empty line
@@ -32,7 +50,7 @@ public class MethodCallsExample {
     }
 
     public static void main(String[] args) {
-        File projectDir = new File("source_to_parse/junit-master");
+        File projectDir = new File("source_to_parse/springBootIntegertion/src/main/java/com/hdw/springboot/contorller");
         listMethodCalls(projectDir);
     }
 }
